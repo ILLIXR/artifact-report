@@ -1,18 +1,18 @@
 [submodule "upload/results"]
-	path = upload/results
+	path = results
 	url = git@github.com:ILLIXR/results.git
 [submodule "upload/ILLIXR-Evaluation"]
-	path = upload/ILLIXR-Evaluation
+	path = ILLIXR-Evaluation
 	url = git@github.com:Boyuan-Tian/ILLIXR-Evaluation.git
 [submodule "upload/OpenXR-Apps"]
-	path = upload/OpenXR-Apps
+	path = OpenXR-Apps
 	url = git@github.com:Hyjale/OpenXR-Apps
 [submodule "upload/monado_integration"]
-	path = upload/monado_integration
+	path = monado_integration
 	url = git@github.com:ILLIXR/monado_integration.git
 [submodule "upload/ILLIXR"]
-	path = upload/ILLIXR
+	path = ILLIXR
 	url = git@github.com:ILLIXR/ILLIXR.git
 [submodule "upload/godot"]
-	path = upload/godot
+	path = godot
 	url = git@github.com:ILLIXR/godot.git
