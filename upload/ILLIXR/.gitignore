@@ -1,0 +1,14 @@
+/data.zip
+/data*
+*.exe
+*.so
+*.swp
+*.swo
+docs/build
+site/
+log/
+imgui.ini
+.gdb_history
+output.*
+metrics/
+tags
