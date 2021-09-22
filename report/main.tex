@@ -1,0 +1,205 @@
+% LaTeX template for Artifact Evaluation V20201122
+%
+% Prepared by 
+% * Grigori Fursin (cTuning foundation, France) 2014-2020
+% * Bruce Childers (University of Pittsburgh, USA) 2014
+%
+% See examples of this Artifact Appendix in
+%  * SC'17 paper: https://dl.acm.org/citation.cfm?id=3126948
+%  * CGO'17 paper: https://www.cl.cam.ac.uk/~sa614/papers/Software-Prefetching-CGO2017.pdf
+%  * ACM ReQuEST-ASPLOS'18 paper: https://dl.acm.org/citation.cfm?doid=3229762.3229763
+%
+% (C)opyright 2014-2020
+%
+% CC BY 4.0 license
+%
+
+\documentclass{sigplanconf}
+
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{minted}
+\usepackage{graphicx}
+
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+\newcommand{\zenodo}{\footnotesize \url{https://doi.org/xxx}}
+
+\begin{document}
+
+\special{papersize=8.5in,11in}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% When adding this appendix to your paper, 
+% please remove above part
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+\section{Artifact Appendix}
+
+\subsection{Abstract}
+
+The artifacts for this paper consist of the ILLIXR system and analysis analysis scripts.
+
+\subsection{Artifact check-list (meta-information)}
+
+{\small
+\begin{itemize}
+  \item {\bf Program: } ILLIXR and ILLIXR Analysis
+  \item {\bf Compilation: } Make 4.2, clang 10.0, CUDA 11.1, Python 3.8 (included in install scripts)
+  \item {\bf Data set: } See \S IIIA (downloaded by program)
+  \item {\bf Run-time environment: } Ubuntu 18.04 + install scripts.
+  \item {\bf Hardware: } Any x86-64 system with CUDA can run, but one needs the hardware in \S IIID for exact repeatability.
+  \item {\bf Output: } \texttt{results/output/*} and \texttt{results/Graphs/*}.
+  \item {\bf Experiments: } For each hardware platform, for each app, run ILLIXR.
+  \item {\bf How much disk space required: } 5Gb, including downloaded datasets
+  \item {\bf How much time is needed to prepare workflow: } 1 hour
+  \item {\bf How much time is needed to complete experiments: } 20 minutes per hardware platform
+  \item {\bf Publicly available: } Yes, see archive URL.
+  \item {\bf Code licenses: } The system licensed under NCSA. Each component is licensed under one of: ElasticFusion License, NCSA, MIT, Simplified BSD, LGPL v3.0, LGPL v2.1, Boost Software License v1.0, GPL v3.0. See {\footnotesize \url{https://github.com/ILLIXR/ILLIXR/\#licensing-structure}}
+  \item {\bf Data licenses: } Each dataset is licensed under one of: proprietary, ElasticFusion License, Creative Commons 0.
+  \item {\bf Archived (provide DOI)?: } \zenodo
+\end{itemize}
+}
+
+\subsection{Description}
+
+\subsubsection{How to access}
+
+One can find the version we used for this paper here (\zenodo), and a rolling release here ({\footnotesize \url{https://github.com/ILLIXR/}}). We suggest using the rolling release, unless exact repeatability is desired.
+
+\subsubsection{Hardware dependencies}
+
+One can find the hardware we used for this paper in \S IIID. ILLIXR will still work on a generic x86-64 Ubuntu system, but the results may not be exactly repeatable.
+
+\subsubsection{Software dependencies}
+
+{
+\footnotesize
+\begin{minted}{shell}
+./ILLIXR/install\_deps.sh
+python3 -m pip install poetry
+sudo apt-get install build-essential scons pkg-config \
+  libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev \
+  libglu-dev libasound2-dev libpulse-dev libudev-dev \
+  libxi-dev libxrandr-dev yasm
+scons -C godot -j$(nproc) platform=x11 target=release_debug
+cd results/analysis; poetry install; cd ../..
+\end{minted}
+}
+
+See our online documentation for more details:\newline
+{\footnotesize \url{https://illixr.github.io/ILLIXR/getting_started}}
+
+\subsubsection{Data sets}
+
+The software pulls required datasets automatically at runtime.
+
+\subsection{Installation}
+
+Not applicable.
+
+\subsection{Experiment workflow}
+
+First, we have to compile each application:
+
+{
+\footnotesize
+\begin{minted}{shell}
+for app_path in OpenXR-Apps/*; do
+  ./godot/bin/godot.x11.opt.tools.64
+  # Import project (project.godot) (fig 1)
+  # Export project (fig 2)
+  # Select "Linux (Runnable)" (fig 3)
+  # Select Custom Template="./godot/bin/godot.x11.opt.tools.64"
+  # Select Export Path="./OpenXR-Apps/$app/bin"
+  # Where app is replaced by $app shorname (e.g. "sponza")
+done
+\end{minted}
+}
+
+Then, we run each application:
+
+{\scriptsize
+\begin{minted}{shell}
+hardware=""
+# manually set to one of "jetson-lp", "jetson-hp", "desktop"
+for app_path in OpenXR-Apps/*; do
+  app=$(basename ${app_path})
+  cmd="./ILLIXR/runner.sh ILLIXR/configs/${app}.yaml"
+  ${cmd}
+  nvidia-smi -q --display=UTILIZATION,POWER,TEMPERATURE \
+    --loop-ms=200 ${cmd}
+  perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
+    -- ${cmd}
+  mv ILLIXR/metrics results/metrics/metrics-${hardware}-${app}
+done
+\end{minted}
+}
+
+To switch between high- and low-power mode on Jetson
+
+{\small
+\begin{minted}{shell}
+sudo jetson_clocks --restore ${lp_or_hp}_mode.txt
+\end{minted}
+}
+
+\subsection{Evaluation and expected results}
+
+Make sure to synchronize the \texttt{results/metrics/} directory from all hardware platforms onto the desktop before continuing. On the desktop, run
+
+{\footnotesize
+\begin{minted}{shell}
+cd results/analysis
+poetry run python3 main.py
+\end{minted}
+}
+
+The output from our run is available in \texttt{metrics-snapshot} and our graphs are available in \texttt{Graphs-snapshot}.
+
+\begin{itemize}
+\item Fig 3 is {\footnotesize\texttt{results/Graphs/fps-jlp/jhp/desktop.pdf}}
+\item Fig 4 is {\footnotesize\texttt{results/Graphs/timeseries-platformer-desktop-1.pdf}} and {\footnotesize\texttt{results/Graphs/timeseries-platformer-desktop-2.pdf}}
+\item Fig 5 is {\footnotesize\texttt{results/Graphs/cpu-breakdown.pdf}}
+\item Fig 6 is {\footnotesize\texttt{results/Graphs/power-total.pdf}} and\newline {\footnotesize\texttt{results/Graphs/power-breakdown.pdf}}
+\item Fig 7 is {\footnotesize\texttt{results/Graphs/mtp-platformer.pdf}}
+\item Fig 8 is {\footnotesize\texttt{results/Graphs/microarchitecture.pdf}}
+\end{itemize}
+
+To replicate Table IV and V, see \texttt{ILLIXR-Evaluation/README.md}. The output from our run of this script is available at \texttt{ILLIXR\_SSIM\_FLIP}.
+
+\subsection{Experiment customization}
+
+Here are cutomizations we anticipate:
+
+\begin{itemize}
+\item Modify or add your own app to \texttt{ILLIXR/app/*}.
+\item Add your own analysis pass to \texttt{results/analysis/*.py}
+\item Add your own plugin to the ILLIXR system in \texttt{ILLIXR/*}. See our online documentation for details:\newline
+{\footnotesize \url{https://illixr.github.io/ILLIXR/writing_your_plugin/}}
+\end{itemize}
+
+\subsection{Notes}
+
+\begin{figure}[h]
+  \caption{Import a project in Godot}
+  \includegraphics[width=\linewidth]{import.png}
+\end{figure}
+
+\begin{figure}[h]
+  \caption{Export project in Godot}
+  \includegraphics[width=\linewidth]{export.png}
+\end{figure}
+
+\begin{figure}[h]
+  \caption{Select export options Godot}
+  \includegraphics[width=\linewidth]{export_options.png}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% When adding this appendix to your paper, 
+% please remove below part
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
