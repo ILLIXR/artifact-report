@@ -39,17 +39,17 @@
 
 \subsection{Abstract}
 
-The artifacts consist of the ILLIXR system, test applications, and analysis analysis scripts.
+The artifacts consist of the ILLIXR system, test applications, and results scripts.
 
 \subsection{Artifact check-list (meta-information)}
 
 {\small
 \begin{itemize}
-  \item {\bf Program: } ILLIXR and ILLIXR Analysis
+  \item {\bf Program: } ILLIXR, Monado, test applications, ILLIXR results scripts.
   \item {\bf Compilation: } Make 4.2, clang 10.0, CUDA 11.1, Python 3.8 (included in install scripts)
-  \item {\bf Data set: } See \S IIIA (downloaded by program)
+  \item {\bf Data set: } See \S IIIC (included in artifact) and \S IIID (downloaded by program).
   \item {\bf Run-time environment: } Ubuntu 18.04 + install scripts.
-  \item {\bf Hardware: } Any x86-64 system with CUDA can run, but one needs the hardware in \S IIID for exact repeatability.
+  \item {\bf Hardware: } Any x86-64 system with CUDA can run, but one needs the hardware in \S IIIA for exact repeatability.
   \item {\bf Output: } \texttt{results/output/*} and \texttt{results/Graphs/*}.
   \item {\bf Experiments: } For each hardware platform, for each app, run ILLIXR.
   \item {\bf How much disk space required: } 5Gb, including downloaded datasets
@@ -58,7 +58,7 @@ The artifacts consist of the ILLIXR system, test applications, and analysis anal
   \item {\bf Publicly available: } Yes, see archive URL.
   \item {\bf Code licenses: } The system licensed under NCSA. Each component is licensed under one of: ElasticFusion License, NCSA, MIT, Simplified BSD, LGPL v3.0, LGPL v2.1, Boost Software License v1.0, GPL v3.0. See {\footnotesize \url{https://github.com/ILLIXR/ILLIXR/\#licensing-structure}}
   \item {\bf Data licenses: } Each dataset is licensed under one of: proprietary, ElasticFusion License, Creative Commons 0.
-  \item {\bf Archived (provide DOI)?: } \zenodo
+  \item {\bf Archived (provide DOI): } \zenodo
 \end{itemize}
 }
 
@@ -70,7 +70,7 @@ One can find the version we used for this paper here (\zenodo), and a rolling re
 
 \subsubsection{Hardware dependencies}
 
-One can find the hardware we used for this paper in \S IIID. ILLIXR will still work on a generic x86-64 Ubuntu system, but the results may not be exactly repeatable.
+One can find the hardware we used for this paper in \S IIIA. ILLIXR will still work on a generic x86-64 Ubuntu system, but the results may not be exactly repeatable.
 
 \subsubsection{Software dependencies}
 
@@ -85,6 +85,7 @@ sudo apt-get install build-essential scons pkg-config \
   libxi-dev libxrandr-dev yasm
 scons -C godot -j$(nproc) platform=x11 target=release_debug
 cd results/analysis; poetry install; cd ../..
+sudo sh -c 'echo 0 >/proc/sys/kernel/perf_event_paranoid'
 \end{minted}
 }
 
@@ -129,7 +130,7 @@ for app_path in OpenXR-Apps/*; do
   cmd="./ILLIXR/runner.sh ILLIXR/configs/${app}.yaml"
   ${cmd}
   nvidia-smi -q --display=UTILIZATION,POWER,TEMPERATURE \
-    --loop-ms=200 ${cmd}
+    --loop-ms=200
   perf stat -e power/energy-cores/,power/energy-pkg/,power/energy-ram/ \
     -- ${cmd}
   mv ILLIXR/metrics results/metrics/metrics-${hardware}-${app}
@@ -180,7 +181,9 @@ Here are cutomizations we anticipate:
 {\footnotesize \url{https://illixr.github.io/ILLIXR/writing_your_plugin/}}
 \end{itemize}
 
-\subsection{Notes}
+\eject
+
+\subsection{Figures}
 
 \begin{figure}[h]
   \caption{Import a project in Godot}
