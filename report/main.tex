@@ -123,7 +123,7 @@ Then, we run each application:
 {\scriptsize
 \begin{minted}{shell}
 hardware=""
-# manually set to one of "jetson-lp", "jetson-hp", "desktop"
+# manually set to one of "jetsonlp", "jetsonhp", "desktop"
 for app_path in OpenXR-Apps/*; do
   app=$(basename ${app_path})
   cmd="./ILLIXR/runner.sh ILLIXR/configs/${app}.yaml"
