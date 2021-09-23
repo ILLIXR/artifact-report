@@ -16,6 +16,7 @@
           buildInputs = [
             pkgs.which
             pkgs.python39Packages.pygments
+            pkgs.pdftk
             (
               pkgs.texlive.combine {
                 inherit (pkgs.texlive)

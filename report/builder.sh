@@ -9,5 +9,8 @@ for file in "${src}/"*; do
 	fi
 done
 
-pdflatex -shell-escape main.tex
+pdflatex -shell-escape appendix.tex
+cp /build/appendix.pdf "${out}/appendix.pdf"
+
+pdftk A=uncombined.pdf B=appendix.pdf cat A1-10 B A11-end output main.pdf
 mv /build/main.pdf "${out}/main.pdf"
