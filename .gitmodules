@@ -16,3 +16,6 @@
 [submodule "upload/godot"]
 	path = godot
 	url = git@github.com:ILLIXR/godot.git
+[submodule "ILLIXRv1"]
+	path = ILLIXRv1
+	url = git@github.com:ILLIXR/ILLIXR.git
