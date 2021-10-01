@@ -5,6 +5,7 @@ cd "$(dirname ""${0}"")"
 
 # Install dependencies
 ./ILLIXR/install_deps.sh
+./ILLIXRv1/install_deps.sh
 ./results/install_deps.sh
 ./godot/install_deps.sh
 
