@@ -170,11 +170,13 @@ The output from our run is available in \texttt{metrics-snapshot} and our graphs
 \item Fig 8 is {\footnotesize\texttt{results/Graphs/microarchitecture.pdf}}
 \end{itemize}
 
-To replicate Table IV and V, see \texttt{ILLIXR-Evaluation/README.md}. The output from our run of this script is available at \texttt{ILLIXR\_SSIM\_FLIP}.
+To replicate Table VI, run \texttt{./ILLIXRv1/all.sh} and see the reported statistics in stdout.
 
-To replicate Table VI, Table VII, run each non-trivial commend of \texttt{ILLIXRv1/all.sh} as an argument to \texttt{perf record}. Then run \texttt{perf report}.
+To replicate Table VII, run Visual Reprojection and Hologram in NVIDIA\textsuperscript{\textcopyright} Nsight\textsuperscript{TM} Systems, and run Audio Encoding and Audio Decoding in Intel\textsuperscript{\textcopyright} VTune\textsuperscript{TM} Hotspot Analysis. See \texttt{./ILLIXRv1/all.sh} for the commands to analyze.
 
-To replicate Fig 8, run each non-trivial command of \texttt{ILLIXRv1/all.sh} in Intel\textsuperscript{\textcopyright} VTune\textsuperscript{TM}.
+To replicate Fig 8, run each non-trivial command of \texttt{ILLIXRv1/all.sh} in Intel\textsuperscript{\textcopyright} VTune\textsuperscript{TM} Microarchitectural Exploration Analysis.
+
+See \url{https://illixr.github.io/ILLIXR/legacy/v1/} for more details on running the components of ILLIXR v1.
 
 \subsection{Experiment customization}
 
