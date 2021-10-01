@@ -23,7 +23,7 @@
 \usepackage{graphicx}
 
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
-\newcommand{\zenodo}{\footnotesize \url{https://doi.org/10.5281/zenodo.5523601}}
+\newcommand{\zenodo}{\footnotesize \url{10.5281/zenodo.5542407}}
 
 \begin{document}
 
@@ -39,17 +39,21 @@
 
 \subsection{Abstract}
 
-The artifacts consist of the ILLIXR system, test applications, and results scripts.
+The artifacts consist of ILLIXR version 1, ILLIXR version 2, Monado, Godot, OpenXR test applications (AR Demo, Materials, Sponza, Platformer), analysis scripts, raw data, graphs, regression tests, and documentation.
+
+Note that ILLIXR version 1 is the set of isolated components used for \S IVB, while ILLIXR Version 2 is the same components in an integrated system used for \S IVA. The artifact contains both. Where unspecified, we are referring to ILLIXR version 2.
+
+We have made the effort to automate as much as possible of the installation process. For best results use a fresh install of Ubuntu 18.04 LTS or 20.04.
 
 \subsection{Artifact check-list (meta-information)}
 
 {\small
 \begin{itemize}
-  \item {\bf Program: } ILLIXR, Monado, test applications, ILLIXR results scripts.
+  \item {\bf Program: } ILLIXR v1, ILLIXR v2, Monado, Godot, OpenXR test applications (AR Demo, Materials, Sponza, Platformer), analysis scripts.
   \item {\bf Compilation: } Make 4.2, clang 10.0, CUDA 11.1, Python 3.8 (included in install scripts)
   \item {\bf Data set: } See \S IIIC (included in artifact) and \S IIID (downloaded by program).
   \item {\bf Run-time environment: } Ubuntu 18.04 + install scripts.
-  \item {\bf Hardware: } Any x86-64 system with CUDA can run, but one needs the hardware in \S IIIA for exact repeatability.
+  \item {\bf Hardware: } Any x86-64 system with an NVIDIA GPU can run, but one needs the hardware in \S IIIA for exact repeatability.
   \item {\bf Output: } \texttt{results/output/*} and \texttt{results/Graphs/*}.
   \item {\bf Experiments: } For each hardware platform, for each app, run ILLIXR.
   \item {\bf How much disk space required: } 5Gb, including downloaded datasets
@@ -66,35 +70,31 @@ The artifacts consist of the ILLIXR system, test applications, and results scrip
 
 \subsubsection{How to access}
 
-One can find the version we used for this paper here (\zenodo), and a rolling release here ({\footnotesize \url{https://github.com/ILLIXR/}}). We suggest using the rolling release, unless exact repeatability is desired.
+One can find the version we used for this paper here (\zenodo), and a rolling release here ({\footnotesize \url{https://github.com/ILLIXR/ILLIXR}}). We suggest using the rolling release, unless exact repeatability is desired.
 
 \subsubsection{Hardware dependencies}
 
-One can find the hardware we used for this paper in \S IIIA. ILLIXR will still work on a generic x86-64 Ubuntu system, but the results may not be exactly repeatable.
+One can find the hardware we used for this paper in \S IIIA. ILLIXR will still work on a generic x86-64 Ubuntu system with a GPU, but the results may not be exactly repeatable.
 
 \subsubsection{Software dependencies}
 
+Refer to NVIDIA's instructions for your GPU to install the proprietary NVIDIA driver and NVIDIA CUDA SDK.
+
 {
-\footnotesize
+\small
 \begin{minted}{shell}
-./ILLIXR/install\_deps.sh
-python3 -m pip install poetry
-sudo apt-get install build-essential scons pkg-config \
-  libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev \
-  libglu-dev libasound2-dev libpulse-dev libudev-dev \
-  libxi-dev libxrandr-dev yasm
-scons -C godot -j$(nproc) platform=x11 target=release_debug
-cd results/analysis; poetry install; cd ../..
-sudo sh -c 'echo 0 >/proc/sys/kernel/perf_event_paranoid'
+./install_deps.sh
 \end{minted}
 }
+
+This script is \textit{idempotent}, so there is no harm in interrupting it and running it twice. It installs basic build tools, profiling tools, Python, ROS, conda, OpenCV 3.4, Eigen, datasets, and several other resources.
 
 See our online documentation for more details:\newline
 {\footnotesize \url{https://illixr.github.io/ILLIXR/getting_started}}
 
 \subsubsection{Data sets}
 
-The software pulls required datasets automatically at runtime.
+The software pulls required datasets automatically when downloading software dependencies.
 
 \subsection{Installation}
 
@@ -102,8 +102,9 @@ Not applicable.
 
 \subsection{Experiment workflow}
 
-First, we have to compile each application:
+First, we have to compile each application with Godot:
 
+% TODO: automate this
 {
 \footnotesize
 \begin{minted}{shell}
@@ -119,8 +120,9 @@ done
 \end{minted}
 }
 
-Then, we run each application:
+Then, we run each application in ILLIXR V2:
 
+% TODO: Test this
 {\scriptsize
 \begin{minted}{shell}
 hardware=""
@@ -170,6 +172,10 @@ The output from our run is available in \texttt{metrics-snapshot} and our graphs
 
 To replicate Table IV and V, see \texttt{ILLIXR-Evaluation/README.md}. The output from our run of this script is available at \texttt{ILLIXR\_SSIM\_FLIP}.
 
+To replicate Table VI, Table VII, run each non-trivial commend of \texttt{ILLIXRv1/all.sh} as an argument to \texttt{perf record}. Then run \texttt{perf report}.
+
+To replicate Fig 8, run each non-trivial command of \texttt{ILLIXRv1/all.sh} in Intel\textsuperscript{\textcopyright} VTune\textsuperscript{TM}.
+
 \subsection{Experiment customization}
 
 Here are cutomizations we anticipate:
@@ -181,21 +187,19 @@ Here are cutomizations we anticipate:
 {\footnotesize \url{https://illixr.github.io/ILLIXR/writing_your_plugin/}}
 \end{itemize}
 
-\eject
-
 \begin{figure}[h]
   \caption{Import a project in Godot}
-  \includegraphics[width=\linewidth]{import.png}
+  \includegraphics[width=0.7\linewidth]{import.png}
 \end{figure}
 
 \begin{figure}[h]
   \caption{Export project in Godot}
-  \includegraphics[width=\linewidth]{export.png}
+  \includegraphics[width=0.7\linewidth]{export.png}
 \end{figure}
 
 \begin{figure}[h]
   \caption{Select export options Godot}
-  \includegraphics[width=\linewidth]{export_options.png}
+  \includegraphics[width=0.7\linewidth]{export_options.png}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
